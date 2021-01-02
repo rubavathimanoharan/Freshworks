@@ -13,7 +13,7 @@ public class Freshworks
  static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
     private Object json; 
     JSONObject obj=new JSONObject(); 
-   static String file="C:\\Users\\rubav\\Documents\\NetBeansProjects\\Freshworks\\src\\freshworks\\data.json";
+   static String file="data.json";
      Scanner scann = new Scanner (System.in);
     File f=new File(file);
     
