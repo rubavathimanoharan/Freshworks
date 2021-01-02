@@ -11,37 +11,67 @@ import org.json.simple.parser.ParseException;
 public class Freshworks
 {
  static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-    private Object json;   
- public void Insert( ) throws IOException, Exception
+    private Object json; 
+    JSONObject obj=new JSONObject(); 
+   static String file="C:\\Users\\rubav\\Documents\\NetBeansProjects\\Freshworks\\src\\freshworks\\data.json";
+     Scanner scann = new Scanner (System.in);
+    File f=new File(file);
+    
+    
+ public synchronized void Insert( ) throws IOException, Exception
  {
-     
-   Scanner in = new Scanner (System.in);
-   JSONObject obj=new JSONObject(); 
-        System.out.println("Enter your key: ");   
-	long keyval=in.nextInt();
-       
-        File f=new File("C:\\Users\\rubav\\Documents\\NetBeansProjects\\Freshworks\\src\\freshworks\\data.json");
-        if(f.length()!=0)
+     System.out.println("enter 1 to create your own file path\nEnter any number to create a default path");
+        int choice=scann.nextInt();
+        if(choice==1)
         {
+            System.out.println("Enter path eg.C:\\Users\\rubav\\Documents\\NetBeansProjects\\Freshworks\\src\\freshworks\\data.json");
+            file=scann.next();
+            File filee = new File(file);
+            boolean exists = filee.exists();
+            if(!exists)
+                System.out.println("created successfully");
+            else
+                System.out.println("File already exist");
+        }
+        
+     Scanner in = new Scanner (System.in); 
+       System.out.println("enter key with 32 char not execeeding that");   
+	String keyval=in.next();
+         
        if(check(keyval)==0)
        {
           System.out.println("The entered key is already occupied ,please enter a new key");
-           keyval=in.nextInt(); 
+           keyval=in.next(); 
        }
+        
+        System.out.println("Enter your any value: ");
+        String value=in.next();
+        
+        int flag=1;
+        String key="";
+       while(flag==1)
+        {
+        if(keyval.length()>32)
+        {
+            System.out.println("key exceeds 32 characters the key value is trimmed to 32 characters"); 
+            System.out.println("if you want to re-enter the key enter 1 else any number");
+            flag=in.nextInt();
+            if(flag!=1)
+            {
+                key=key.substring(0,32);
+                 break;
+            }
         }
-	System.out.println("Enter Name: ");
-        String name=in.next();
+        else
+        {
+            
+            break;
+        }
+        }
         
-        System.out.println("Enter country name : ");
-	String addr=in.next();
-        
-	System.out.println("Enter Phone number: ");
-	long phone;     
-        phone = in.nextInt();
- 
+     
   try{  
-          long size=f.length();
-            System.out.println("size of the file "+size);
+          long size=file.length();
             double size_of_file;
             if(size>10000){
                 size_of_file=size/1024;//KB=b/0124
@@ -51,87 +81,74 @@ public class Freshworks
                     System.out.println("The File size should be less than 1 GB");
                 }
             }
-        
-//Toast.makeText(MainActivity.this, ""+obj, Toast.LENGTH_LONG);
+         obj.put(keyval,value);
+          try (FileWriter file1 = new FileWriter(file,false)) {
+          file1.write(obj.toJSONString());
+          file1.flush();
+                }
        
- obj.put("key",keyval);
- obj.put("name",name); 
-  obj.put("country",addr);
-  obj.put("phone",phone);
-         try (PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter("C:\\Users\\rubav\\Documents\\NetBeansProjects\\Freshworks\\src\\freshworks\\data.json",true)))) {
-             pw.print(obj);
-             pw.append("\n");
-             System.out.println("Details added\n\n");
-         }
   }catch(Exception e){
             System.out.println("Error was occured at creating the key while try to write the replaced content"+e);
         }
   }
  
- public int check(long keyval) throws FileNotFoundException, IOException, ParseException
+ public int check(String keyval) throws FileNotFoundException, IOException, ParseException
  {
-       Object obj; 
-        obj = new JSONParser().parse(new FileReader("C:\\Users\\rubav\\Documents\\NetBeansProjects\\Freshworks\\src\\freshworks\\data.json"));
-         
+       Object obj1; 
+        obj1 = new JSONParser().parse(new FileReader(f));
         // typecasting obj to JSONObject 
-        JSONObject jo = (JSONObject) obj; 
-    
+        JSONObject jo = (JSONObject) obj1; 
+       String key = null;
         // getting firstName and lastName 
-        long key = (long) jo.get("key"); 
-         if(key==keyval)
+        key =  (String) jo.get(keyval); 
+         if(key!=null)
          {
             return 0; 
          }
          else {
          return 1;
      }
+        
  }
  
- public void Read( ) throws IOException, ParseException
+ public synchronized void Read( ) throws IOException, ParseException
  {
-  Object obj; 
-        obj = new JSONParser().parse(new FileReader("C:\\Users\\rubav\\Documents\\NetBeansProjects\\Freshworks\\src\\freshworks\\data.json"));
-         
+  Object obj2; 
+        obj2 = new JSONParser().parse(new FileReader(file));
+         String key;
         // typecasting obj to JSONObject 
-        JSONObject jo = (JSONObject) obj;
-        // getting firstName and lastName 
-        long key = (long) jo.get("key"); 
-        String name = (String) jo.get("name"); 
-        String country = (String) jo.get("country");      
-        long phone = (long) jo.get("phone"); 
-     //   System.out.println(phone);    
-        BufferedReader in = new BufferedReader(new FileReader("C:\\Users\\rubav\\Documents\\NetBeansProjects\\Freshworks\\src\\freshworks\\data.json"));
-        try (Scanner read = new Scanner(in)) {
-            System.out.println("key:"+key+ "  name:" + name + "  country:" + country + "  phone:" + phone+"\n");
-        }  
- }
- 
+        JSONObject jo = (JSONObject) obj2; 
+      // getting firstName and lastName 
+        Scanner scan=new Scanner(System.in);
+        System.out.println("ENter the key");
+        key=scan.next();
+       String value = (String) jo.get(key); 
+            System.out.println("key:"+key+ "  value:" +value+"\n");
+}
 
  
-public void Delete( ) throws IOException, ParseException
+public synchronized void Delete( ) throws IOException, ParseException
 {
     Scanner scan=new Scanner(System.in);
     String key;
-    Object obj; 
-        obj = new JSONParser().parse(new FileReader("C:\\Users\\rubav\\Documents\\NetBeansProjects\\Freshworks\\src\\freshworks\\data.json"));
+    Object obj3; 
+        obj3 = new JSONParser().parse(new FileReader(file));
        JSONObject jo; 
-        jo = (JSONObject) obj;
+        jo = (JSONObject) obj3;
         System.out.println("enter the key which you want to delete");
          key=scan.nextLine();
         jo.remove(key);
         System.out.println("kay value pair of the key: "+key + " is deleted");
-        try (PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter("C:\\Users\\rubav\\Documents\\NetBeansProjects\\Freshworks\\src\\freshworks\\data.json",false)))) {
+        try (PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(file,false)))) {
             pw.print(jo);
         }
 }
-
 
 public static void main(String args[]) throws IOException, ParseException, Exception, FileNotFoundException
 {
      Freshworks in = new Freshworks();
     int ch,choice;
     Scanner scan=new Scanner(System.in);
-   // String q="*";
     while(true)
     {
     System.out.println("**********************");
